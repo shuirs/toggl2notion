@@ -51,8 +51,6 @@ def insert_to_notion():
     response = requests.get(
         "https://api.track.toggl.com/api/v9/me/time_entries", params=params, auth=auth
     )
-    print(response.status_code)
-    print(response.text)
     time_entries = response.json()
     time_entries.sort(key=lambda x: x["start"], reverse=False)
 
@@ -70,46 +68,48 @@ def insert_to_notion():
             id = task.get("id")
             item["Id"] = id
             project_id = task.get("project_id")
-            workspace_id = task.get("workspace_id")
-            start = pendulum.parse(task.get("start"))
-            stop = pendulum.parse(task.get("stop"))
-            start = start.in_timezone("Asia/Shanghai").int_timestamp
-            stop = stop.in_timezone("Asia/Shanghai").int_timestamp
-            item["时间"] = (start, stop)
-            response = requests.get(
-                f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects/{project_id}",
-                auth=auth,
-            )
-            project = response.json().get("name")
-            emoji, project = split_emoji_from_string(project)
-            item["标题"] = project
-            client_id = response.json().get("cid")
-            project_properties = {}
-            if client_id:
+            if project_id:
+                workspace_id = task.get("workspace_id")
+                start = pendulum.parse(task.get("start"))
+                stop = pendulum.parse(task.get("stop"))
+                start = start.in_timezone("Asia/Shanghai").int_timestamp
+                stop = stop.in_timezone("Asia/Shanghai").int_timestamp
+                item["时间"] = (start, stop)
                 response = requests.get(
-                    f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients/{client_id}",
+                    f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects/{project_id}",
                     auth=auth,
                 )
-                client = response.json().get("name")
-                client_emoji, client = split_emoji_from_string(client)
-                item["Client"] = [
+                project = response.json().get("name")
+                emoji, project = split_emoji_from_string(project)
+                item["标题"] = project
+                client_id = response.json().get("cid")
+                #默认金币设置为1
+                project_properties = {"金币":{"number": 1}}
+                if client_id:
+                    response = requests.get(
+                        f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients/{client_id}",
+                        auth=auth,
+                    )
+                    client = response.json().get("name")
+                    client_emoji, client = split_emoji_from_string(client)
+                    item["Client"] = [
+                        notion_helper.get_relation_id(
+                            client,
+                            notion_helper.client_database_id,
+                            {"type": "emoji", "emoji": client_emoji},
+                        )
+                    ]
+                    project_properties["Client"] = {
+                        "relation": [{"id": id} for id in item.get("Client")]
+                    }
+                item["Project"] = [
                     notion_helper.get_relation_id(
-                        client,
-                        notion_helper.client_database_id,
-                        {"type": "emoji", "emoji": client_emoji},
+                        project,
+                        notion_helper.project_database_id,
+                        {"type": "emoji", "emoji": emoji},
+                        properties=project_properties,
                     )
                 ]
-                project_properties["Client"] = {
-                    "relation": [{"id": id} for id in item.get("Client")]
-                }
-            item["Project"] = [
-                notion_helper.get_relation_id(
-                    project,
-                    notion_helper.project_database_id,
-                    {"type": "emoji", "emoji": emoji},
-                    properties=project_properties,
-                )
-            ]
             if task.get("description") is not None:
                 item["备注"] = task.get("description")
             properties = utils.get_properties(item, time_properties_type_dict)
