@@ -1,6 +1,3 @@
-import argparse
-from datetime import datetime, timedelta
-import json
 import os
 from requests.auth import HTTPBasicAuth
 import pendulum
@@ -54,6 +51,8 @@ def insert_to_notion():
     response = requests.get(
         "https://api.track.toggl.com/api/v9/me/time_entries", params=params, auth=auth
     )
+    print(response.status_code)
+    print(response.text)
     time_entries = response.json()
     time_entries.sort(key=lambda x: x["start"], reverse=False)
 
@@ -127,5 +126,5 @@ def insert_to_notion():
 
 if __name__ == "__main__":
     notion_helper = NotionHelper()
-    auth = HTTPBasicAuth(os.getenv("EMAIL"), os.getenv("PASSWORD"))
+    auth = HTTPBasicAuth(f"{os.getenv('EMAIL').strip()}", f"{os.getenv('PASSWORD').strip()}")
     insert_to_notion()
