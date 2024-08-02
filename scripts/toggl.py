@@ -79,7 +79,7 @@ def insert_to_notion():
                     f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects/{project_id}",
                     auth=auth,
                 )
-                project = response.json().get("name")
+                project = task.get("description")
                 emoji, project = split_emoji_from_string(project)
                 item["标题"] = project
                 client_id = response.json().get("cid")
