@@ -81,7 +81,9 @@ def insert_to_notion():
                     )
                     project = response.json().get("name")
                     emoji, project = split_emoji_from_string(project)
-                    item["标题"] = task.get("description")
+                    description = task.get("description")
+                    item["标题"] = description
+                    project_description = task.get("project_description")
                     client_id = response.json().get("cid")
                     #默认金币设置为1
                     project_properties = {"金币":{"number": 1}}
