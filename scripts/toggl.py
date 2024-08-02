@@ -79,11 +79,9 @@ def insert_to_notion():
                         f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects/{project_id}",
                         auth=auth,
                     )
-                    project = response.json().get("name")
+                    project = response.json().get("description")
                     emoji, project = split_emoji_from_string(project)
-                    description = task.get("description")
-                    item["标题"] = description
-                    properties = utils.get_properties(item, time_properties_type_dict)
+                    item["标题"] = project
                     client_id = response.json().get("cid")
                     #默认金币设置为1
                     project_properties = {"金币":{"number": 1}}
