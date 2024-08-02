@@ -87,6 +87,9 @@ def insert_to_notion():
                             f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/clients/{client_id}",
                             auth=auth,
                         )
+                        project = response.json().get("name")
+                        emoji, project = split_emoji_from_string(project)
+                        item["标题"] = project
                         client = response.json().get("name")
                         client_emoji, client = split_emoji_from_string(client)
                         item["Client"] = [
@@ -108,7 +111,7 @@ def insert_to_notion():
                         )
                     ]
                 if task.get("description") is not None:
-                    item["备注"] = task.get("description")
+                    item["标题"] = task.get("description")
                 properties = utils.get_properties(item, time_properties_type_dict)
                 parent = {
                     "database_id": notion_helper.time_database_id,
