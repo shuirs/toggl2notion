@@ -11,10 +11,10 @@ SELECT = "select"
 MULTI_SELECT = "multi_select"
 
 time_properties_type_dict = {
-    "标题":TITLE,
+    "标题":RICH_TEXT,
     "时间":DATE,
     "Id":NUMBER,
-    "备注":RICH_TEXT,
+    "备注":TITLE,
     "标签":RELATION,
     "Project":RELATION,
     "Client":RELATION,
