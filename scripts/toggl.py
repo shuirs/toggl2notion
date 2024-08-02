@@ -70,18 +70,20 @@ def insert_to_notion():
                 project_id = task.get("project_id")
                 if project_id:
                     workspace_id = task.get("workspace_id")
+                    description = task.get("description")
                     start = pendulum.parse(task.get("start"))
                     stop = pendulum.parse(task.get("stop"))
                     start = start.in_timezone("Asia/Shanghai").int_timestamp
                     stop = stop.in_timezone("Asia/Shanghai").int_timestamp
                     item["时间"] = (start, stop)
+                    item["标题"] = description
                     response = requests.get(
                         f"https://api.track.toggl.com/api/v9/workspaces/{workspace_id}/projects/{project_id}",
                         auth=auth,
                     )
-                    project = response.json().get("description")
+                    project = response.json().get("name")
                     emoji, project = split_emoji_from_string(project)
-                    item["标题"] = project
+                    item["标题"] = description
                     client_id = response.json().get("cid")
                     #默认金币设置为1
                     project_properties = {"金币":{"number": 1}}
