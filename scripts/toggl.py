@@ -108,7 +108,6 @@ def insert_to_notion():
                         )
                     ]
                 if task.get("description") is not None:
-                    item["标题"] = task.get("description")
                     item["备注"] = task.get("description")
                 properties = utils.get_properties(item, time_properties_type_dict)
                 parent = {
