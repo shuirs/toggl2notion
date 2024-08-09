@@ -111,7 +111,7 @@ def insert_to_notion():
                     ]
                 if task.get("description") is not None:
                     item["标题"] = task.get("description")
-                properties = utils.get_properties(item, time_properties_type_dict)
+                properties = project_properties
                 parent = {
                     "database_id": notion_helper.time_database_id,
                     "type": "database_id",
